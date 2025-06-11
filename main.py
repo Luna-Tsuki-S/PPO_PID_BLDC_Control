@@ -1,14 +1,13 @@
-from opc_client_VFD import connection
+from opcua_client import OPCUAConnection
 from scipy.spatial.distance import cosine
 import numpy as np
 import crawler_esp8266_data #import the .py file of the crawler_esp8266_data
-from stable_baselines3 import PPO
+# from stable_baselines3 import PPO
 import time
 
 def main(now_vol):
     while True:
-        all_the_mode = np.array([115, 57.5, 45])
-        url = "opc.tcp://192.168.0.1:4840"
+        url = "opc.tcp://192.168.244.100:4840"
 
         #get esp8266 return temperature
         data = crawler_esp8266_data.get_data()
@@ -26,12 +25,12 @@ def main(now_vol):
             data['1'] / 100
         ], dtype=np.float32)
 
-
+        obs = [26.0, 68.0]
 
         # 模型預測
         action, _ = model.predict(obs, deterministic=True)
 
-
+        action, 
         print(obs, action)
 
 

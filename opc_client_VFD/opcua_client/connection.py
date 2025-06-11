@@ -2,16 +2,18 @@ from opcua import Client, ua
 import time
 import logging
 
+#self, Now_Temp, Ida_Temp, Now_RPM, RPM_Spd, PID_PER, USS_Run, USS_SPD,url, act
+
 
 class OPCUAConnection:
-    def __init__(self, Now_Temp, Ida_Temp, Now_RPM, RPM_Spd, PID_PER, USS_Run, USS_SPD,url, act):
+    def __init__(self, Now_Temp, Ida_Temp, USS_Run, url, act):
         self._Now_Temp = Now_Temp
         self._Ida_Temp = Ida_Temp
-        self._Now_RPM = Now_RPM
-        self._RPM_Spd = RPM_Spd
-        self._PID_PER = PID_PER
+        # self._Now_RPM = Now_RPM
+        # self._RPM_Spd = RPM_Spd
+        # self._PID_PER = PID_PER
         self._USS_Run = USS_Run
-        self._USS_SPD = USS_SPD
+        # self._USS_SPD = USS_SPD
         self.url = url
         self.client = None  # Initialize as None
         self._act = act
@@ -89,29 +91,29 @@ class OPCUAConnection:
     def Ida_Temp(self, value):
         self._Ida_Temp = value
     
-    @property
-    def Now_RPM(self):
-        return self._Now_RPM
+    # @property
+    # def Now_RPM(self):
+    #     return self._Now_RPM
     
-    @Now_RPM.setter
-    def Now_RPM(self, value):
-        self._Now_RPM = value
+    # @Now_RPM.setter
+    # def Now_RPM(self, value):
+    #     self._Now_RPM = value
 
-    @property
-    def RPM_Spd(self):
-        return self._RPM_Spd
+    # @property
+    # def RPM_Spd(self):
+    #     return self._RPM_Spd
     
-    @RPM_Spd.setter
-    def RPM_Spd(self, value):
-        self._RPM_Spd = value
+    # @RPM_Spd.setter
+    # def RPM_Spd(self, value):
+    #     self._RPM_Spd = value
     
-    @property
-    def PID_PER(self):
-        return self._PID_PER
+    # @property
+    # def PID_PER(self):
+    #     return self._PID_PER
     
-    @PID_PER.setter
-    def PID_PER(self, value):
-        self._PID_PER = value
+    # @PID_PER.setter
+    # def PID_PER(self, value):
+    #     self._PID_PER = value
     
     @property
     def USS_Run(self):
@@ -121,13 +123,13 @@ class OPCUAConnection:
     def USS_Run(self, value):
         self._USS_Run = value
     
-    @property
-    def USS_SPD(self):
-        return self._USS_SPD
+    # @property
+    # def USS_SPD(self):
+    #     return self._USS_SPD
     
-    @USS_SPD.setter
-    def USS_SPD(self, value):
-        self._USS_SPD = value   
+    # @USS_SPD.setter
+    # def USS_SPD(self, value):
+    #     self._USS_SPD = value   
     
     @property
     def act(self):
@@ -158,8 +160,7 @@ class OPCUAConnection:
                     print(f"Data: {data}, Percentage: {per}")
                     self.send_data("ns=4;i=8", self._act)
 
-                else:
-                    self.send_data("ns=4;i=8", self._RPM_Spd)
+                
                     
                 print(f"Ida_Temp: {self._Ida_Temp}, Now_Temp: {self._Now_Temp}, Now_RPM: {self._Now_RPM}, RPM_Spd: {self._RPM_Spd}, PID_PER: {self._PID_PER}, USS_Run: {self._USS_Run}, USS_SPD: {self._USS_SPD}")
                 logging.info(f"[Cycle] Ida_Temp: {self._Ida_Temp}, Now_Temp: {self._Now_Temp}, Now_RPM: {self._Now_RPM}")

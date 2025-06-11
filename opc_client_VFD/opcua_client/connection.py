@@ -6,9 +6,11 @@ import logging
 
 
 class OPCUAConnection:
-    def __init__(self, Now_Temp, Ida_Temp, USS_Run, url, act):
+    def __init__(self, Now_Temp, Ida_Temp, Now_Hum, Ida_Hum, USS_Run, url, act):
         self._Now_Temp = Now_Temp
         self._Ida_Temp = Ida_Temp
+        self._Now_Hum = Now_Hum
+        self._Ida_Hum = Ida_Hum
         # self._Now_RPM = Now_RPM
         # self._RPM_Spd = RPM_Spd
         # self._PID_PER = PID_PER
@@ -90,6 +92,22 @@ class OPCUAConnection:
     @Ida_Temp.setter
     def Ida_Temp(self, value):
         self._Ida_Temp = value
+
+    @property
+    def Now_Hum(self):
+        return self._Now_Hum
+
+    @Now_Hum.setter
+    def Now_Hum(self, value):
+        self._Now_Hum = value
+
+    @property
+    def Ida_Hum(self):
+        return self._Ida_Hum
+
+    @Ida_Hum.setter
+    def Ida_Hum(self, value):
+        self._Ida_Hum = value
     
     # @property
     # def Now_RPM(self):
@@ -145,24 +163,30 @@ class OPCUAConnection:
                 return 1
 
             while True:
-                NNP = self.get_data("ns=4;i=4")
+                Now_RPM = self.get_data("ns=4;i=4")
                 USS_SPD = self.get_data("ns=4;i=6")
-                PID_PER = self.get_data("ns=4;i=7")
-                pid_to_rpm = PID_PER / 27648 * 1650
+                RPM_Spd = self.get_data("ns=4;i=8")
+                HUM_PID_PER = self.get_data("ns=4;i=11")
+                TEM_PID_PER = self.get_data("ns=4;i=12")
+                pid_to_rpm = (TEM_PID_PER + HUM_PID_PER) / 2 / 27648 * 1650
+
                 data = pid_to_rpm / self._act
 
                 self.send_data("ns=4;i=2", self._Ida_Temp)
                 self.send_data("ns=4;i=3", self._Now_Temp)
+                self.send_data("ns=4;i=9", self._Ida_Hum)
+                self.send_data("ns=4;i=10", self._Now_Hum)
                 self.send_data("ns=4;i=5", self._USS_Run)
 
                 if data > 0.5:
                     per = data / 27648
                     print(f"Data: {data}, Percentage: {per}")
                     self.send_data("ns=4;i=8", self._act)
-
+                else:
+                    self.send_data("ns=4;i=8", pid_to_rpm)
                 
                     
-                print(f"Ida_Temp: {self._Ida_Temp}, Now_Temp: {self._Now_Temp}, Now_RPM: {self._Now_RPM}, RPM_Spd: {self._RPM_Spd}, PID_PER: {self._PID_PER}, USS_Run: {self._USS_Run}, USS_SPD: {self._USS_SPD}")
+                print(f"Ida_Temp: {self._Ida_Temp}, Now_Temp: {self._Now_Temp}, Ida_Hum: {self._Ida_Hum}, Now_Hum: {self._Now_Hum}, Now_RPM: {Now_RPM}, RPM_Spd: {RPM_Spd}, TEM_PID_PER: {TEM_PID_PER}, HUM_PID_PER: {HUM_PID_PER},USS_Run: {self._USS_Run}, USS_SPD: {USS_SPD}")
                 logging.info(f"[Cycle] Ida_Temp: {self._Ida_Temp}, Now_Temp: {self._Now_Temp}, Now_RPM: {self._Now_RPM}")
                 
                 if self._Ida_Temp == 0:

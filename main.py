@@ -1,4 +1,4 @@
-from opcua_client import OPCUAConnection
+from opc_client_VFD.opcua_client import OPCUAConnection
 from scipy.spatial.distance import cosine
 import numpy as np
 import crawler_esp8266_data #import the .py file of the crawler_esp8266_data
@@ -7,40 +7,37 @@ import time
 
 def main(now_vol):
     while True:
-        url = "opc.tcp://192.168.244.100:4840"
-
-        #get esp8266 return temperature
+        # 從 ESP8266 擷取感測資料
         data = crawler_esp8266_data.get_data()
-        Ida_Temp = 25
-        Now_Temp =  data['temp']
-        hum = data['hum']
-        USS_Run = 1
 
-        #decision from PPO
-        model = PPO.load("ppo_model.zip")
+        # 假設 get_data() 回傳 {'temp': float, 'hum': float}
+        now_temp = data['temp']
+        now_hum = data['hum']
+        ida_temp = 25.0  # 目標溫度
+        ida_hum = 60.0   # 目標濕度
+        uss_run = True   # 開啟 USS 控制
 
-       
-        obs = np.array([
-            data['0'] / 100,
-            data['1'] / 100
-        ], dtype=np.float32)
-
-        obs = [26.0, 68.0]
-
-        # 模型預測
+        # 模型輸入 (標準化觀測值)
+        obs = np.array([now_temp / 100, now_hum / 100], dtype=np.float32)
         action, _ = model.predict(obs, deterministic=True)
 
-        action, 
-        print(obs, action)
+        print(f"[PPO] Obs: {obs}, Action: {action}")
 
+        # 建立 OPC UA 連線實例
+        opc_connection = OPCUAConnection(
+            Now_Temp=now_temp,
+            Ida_Temp=ida_temp,
+            Now_Hum=now_hum,
+            Ida_Hum=ida_hum,
+            USS_Run=uss_run,
+            url=url,
+            act=float(action)
+        )
 
-        # Create instance of OPC_UA_CONNECTION
-        opc_connection = connection(Ida_Temp, Now_Temp, USS_Run, url, act = action)
+        # 啟動資料傳輸（內部會自動連線與傳送）
+        opc_connection.connection()
 
-        # Start the connection
-        if not opc_connection.connection():
-            print("Connection completed")
+        time.sleep(5)  # 每次執行間隔
 
-        time.sleep(2)
-
-         
+if __name__ == "__main__":
+    main()

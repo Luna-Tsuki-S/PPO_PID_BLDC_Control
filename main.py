@@ -22,8 +22,8 @@ def main(now_vol):
 
        
         obs = np.array([
-            data['0'] / 100,
-            data['1'] / 100
+            data[0] / 100,
+            data[1] / 100
         ], dtype=np.float32)
 
 
@@ -44,4 +44,4 @@ def main(now_vol):
 
         time.sleep(2)
 
-         
+main(

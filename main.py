@@ -7,7 +7,6 @@ import time
 
 def main(now_vol):
     while True:
-        all_the_mode = np.array([115, 57.5, 45])
         url = "opc.tcp://192.168.0.1:4840"
 
         #get esp8266 return temperature
